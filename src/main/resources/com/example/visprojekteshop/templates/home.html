@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eshop rostlin</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchData(url) {
+            const response = await fetch(url);
+            return response.json();
+        }
+
+        async function loadPersons() {
+            const persons = await fetchData('/api/osoby');
+            const personsList = document.getElementById('personsList');
+            personsList.innerHTML = '';
+            persons.forEach(person => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${person.id}. | Jméno: ${person.jmeno} | Příjmení: ${person.prijmeni} | Telefon: ${person.telefon} | Adresa: ${person.adresa}`;
+                personsList.appendChild(listItem);
+            });
+        }
+
+        async function loadEmployees() {
+            const employees = await fetchData('/api/zamestnanci');
+            const employeesList = document.getElementById('employeesList');
+            employeesList.innerHTML = '';
+            employees.forEach(employee => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${employee.id_zamestnanec}. | Jméno: ${employee.jmeno} | Příjmení: ${employee.prijmeni} | Telefon: ${employee.pracovni_telefon} | Pozice: ${employee.pracovni_pozice} | Plat: ${employee.plat}`;
+                employeesList.appendChild(listItem);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPersons();
+            loadEmployees();
+        });
+ async function loadProducts() {
+            console.log('loadProducts function called');
+            const products = await fetchData('/api/produkty');
+            console.log('Products:', products);
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+            products.forEach(produkt => {
+                console.log('Processing product:', produkt);
+                const listItem = document.createElement('div');
+                listItem.className = 'produkt-item';
+                listItem.innerHTML = `
+                    <h3>${produkt.nazev}</h3>
+                    <p>${produkt.popis}</p>
+                    <p><strong>Cena:</strong> ${produkt.cena} Kč</p>
+                    <p><strong>Skladem:</strong> ${produkt.skladem ? 'Ano' : 'Ne'}</p>
+                    <p><strong>Doprava:</strong> ${produkt.jedoprava ? 'Ano' : 'Ne'}</p>
+                    <button class="add-to-cart">Přidat do košíku</button>
+                `;
+                productsList.appendChild(listItem);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded and parsed');
+            loadProducts();
+        });
+
+
+        async function searchProducts() {
+            const searchInput = document.getElementById('searchInput').value;
+            const response = await fetch(`/api/produkty/search?name=${encodeURIComponent(searchInput)}`);
+            const products = await response.json();
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+            products.forEach(produkt => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${produkt.id_produkt}. | Název: ${produkt.nazev} | Popis: ${produkt.popis} | Cena: ${produkt.cena} Kč | Skladem: ${produkt.skladem} | Doprava: ${produkt.jedoprava ? 'Ano' : 'Ne'}`;
+                productsList.appendChild(listItem);
+            });
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        section {
+            margin: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .produkt-item {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .add-to-cart {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .add-to-cart:hover {
+            background-color: #45a049;
+        }
+        input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Eshop rostlin</h1>
+</header>
+
+<section>
+    <h2>Registrace účtu zákazníka</h2>
+    <form action="/createOsoba" method="POST">
+        <label for="personIdcreate">ID osoby:</label>
+        <input type="text" id="personIdcreate" name="id" required><br>
+
+        <label for="personName">Jméno:</label>
+        <input type="text" id="personName" name="jmeno" required><br>
+
+        <label for="personSurname">Příjmení:</label>
+        <input type="text" id="personSurname" name="prijmeni" required><br>
+
+        <label for="personEmail">E-mail:</label>
+        <input type="email" id="personEmail" name="email" required><br>
+
+        <label for="personPhone">Telefon:</label>
+        <input type="number" id="personPhone" name="telefon" required><br>
+
+        <label for="personAddress">Adresa:</label>
+        <input type="text" id="personAddress" name="adresa" required><br>
+
+        <label for="personPassword">Heslo:</label>
+        <input type="password" id="personPassword" name="heslo" required><br>
+
+        <button type="submit">Vytvořit účet</button>
+    </form>
+</section>
+
+<section>
+    <h2>Vymazat osobu</h2>
+    <form action="/deleteOsoba" method="POST">
+        <label for="personId">ID osoby:</label>
+        <input type="number" id="personId" name="personId" required><br>
+        <button type="submit">Vymazat osobu</button>
+    </form>
+</section>
+
+<section>
+    <h2>Produkty</h2>
+    <ul id="productsList">
+        <!-- Seznam produktů bude načten dynamicky -->
+    </ul>
+</section>
+
+<section>
+    <h2>Seznam osob</h2>
+    <ul id="personsList">
+        <!-- Seznam osob bude načten dynamicky -->
+    </ul>
+</section>
+
+<section>
+    <h2>Seznam zaměstnanců</h2>
+    <ul id="employeesList">
+        <!-- Seznam zaměstnanců bude načten dynamicky -->
+    </ul>
+</section>
+
+<section>
+    <a href="/">Zpět na domovskou stránku</a>
+</section>
+
+<section>
+    <h2>Vyhledávání produktů</h2>
+    <input type="text" id="searchInput" placeholder="Vyhledat podle názvu">
+    <button onclick="searchProducts()">Vyhledat</button>
+</section>
+
+</body>
+</html>
